@@ -19,6 +19,7 @@ import {
   Code,
   Calendar,
   Building,
+  ChevronDown,
 } from "lucide-react";
 
 // Type Definitions
@@ -41,6 +42,7 @@ interface Project {
   nama: string;
   deskripsi: string;
   link: string;
+  skills: string[];
 }
 
 interface Certificate {
@@ -93,12 +95,14 @@ export default function ApplicantDashboard() {
       nama: "E-Commerce Platform",
       deskripsi: "Platform e-commerce dengan fitur checkout dan payment gateway terintegrasi",
       link: "https://github.com/example/ecommerce",
+      skills: ["React", "TypeScript", "Tailwind CSS"],
     },
     {
       id: 2,
       nama: "Task Management App",
       deskripsi: "Aplikasi manajemen tugas dengan real-time collaboration",
       link: "https://github.com/example/task-app",
+      skills: ["React", "Firebase"],
     },
   ]);
 
@@ -108,6 +112,12 @@ export default function ApplicantDashboard() {
     link: "",
   });
   const [projectError, setProjectError] = useState("");
+
+  // Project Skill Management State
+  const [selectedProjectForSkillManagement, setSelectedProjectForSkillManagement] =
+    useState<number | null>(null);
+  const [projectSkillSearch, setProjectSkillSearch] = useState("");
+  const [showProjectSkillDropdown, setShowProjectSkillDropdown] = useState(false);
 
   // Certificates State
   const [certificates, setCertificates] = useState<Certificate[]>([
@@ -125,6 +135,35 @@ export default function ApplicantDashboard() {
     tanggalTerbit: "",
   });
   const [certificateError, setCertificateError] = useState("");
+
+  // Master Skills List (Simulated Data)
+  const masterSkills = [
+    "React",
+    "TypeScript",
+    "Tailwind CSS",
+    "Vue.js",
+    "Angular",
+    "Node.js",
+    "Python",
+    "JavaScript",
+    "Firebase",
+    "MongoDB",
+    "PostgreSQL",
+    "GraphQL",
+    "Redux",
+    "Git",
+    "Docker",
+    "AWS",
+    "Figma",
+    "UI Design",
+    "UX Design",
+    "Next.js",
+    "Express.js",
+    "REST API",
+    "MySQL",
+    "CSS/SCSS",
+    "HTML5",
+  ].sort();
 
   // Helper Functions
   const getStatusColor = (status: string) => {
@@ -232,6 +271,7 @@ export default function ApplicantDashboard() {
         nama: newProject.nama,
         deskripsi: newProject.deskripsi,
         link: newProject.link,
+        skills: [],
       },
     ]);
 
@@ -240,6 +280,46 @@ export default function ApplicantDashboard() {
 
   const handleRemoveProject = (id: number) => {
     setProjects(projects.filter((p) => p.id !== id));
+  };
+
+  // Project Skill Management Handlers
+  const handleAddSkillToProject = (projectId: number, skill: string) => {
+    setProjects(
+      projects.map((p) =>
+        p.id === projectId
+          ? {
+              ...p,
+              skills: p.skills.includes(skill)
+                ? p.skills
+                : [...p.skills, skill],
+            }
+          : p
+      )
+    );
+    setProjectSkillSearch("");
+    setShowProjectSkillDropdown(false);
+  };
+
+  const handleRemoveSkillFromProject = (projectId: number, skillToRemove: string) => {
+    setProjects(
+      projects.map((p) =>
+        p.id === projectId
+          ? {
+              ...p,
+              skills: p.skills.filter((s) => s !== skillToRemove),
+            }
+          : p
+      )
+    );
+  };
+
+  const getProjectFilteredSkills = (projectId: number) => {
+    const project = projects.find((p) => p.id === projectId);
+    return masterSkills.filter(
+      (skill) =>
+        skill.toLowerCase().includes(projectSkillSearch.toLowerCase()) &&
+        !project?.skills.includes(skill)
+    );
   };
 
   // Certificates Handlers
@@ -557,140 +637,324 @@ export default function ApplicantDashboard() {
             {/* TAB 3: PROJECTS */}
             <TabsContent value="projects" className="space-y-8">
               <div className="bg-white rounded-3xl shadow-xl p-8 border border-border">
-                <div className="mb-8">
-                  <h2 className="text-2xl font-bold mb-2">Kelola Proyek</h2>
-                  <p className="text-muted-foreground">
-                    Tampilkan karya terbaik Anda kepada perekrut
-                  </p>
-                </div>
-
-                {/* Current Projects Display */}
-                {projects.length > 0 && (
-                  <div className="mb-8">
-                    <h3 className="font-semibold mb-4 text-lg">
-                      Proyek Anda ({projects.length})
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {projects.map((project) => (
-                        <div
-                          key={project.id}
-                          className="p-6 border border-border rounded-2xl hover:border-[#FF6B6B] hover:shadow-lg transition-all bg-gradient-to-br from-white to-gray-50"
-                        >
-                          <div className="flex items-start justify-between gap-4 mb-3">
-                            <h4 className="font-semibold text-base flex-1 line-clamp-2">
-                              {project.nama}
-                            </h4>
-                            <button
-                              onClick={() => handleRemoveProject(project.id)}
-                              className="p-2 hover:bg-red-100 rounded-lg transition-colors text-[#FF6B6B] flex-shrink-0"
-                              title="Hapus proyek"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                          <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
-                            {project.deskripsi}
-                          </p>
-                          {project.link && (
-                            <a
-                              href={project.link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs text-[#FF6B6B] hover:underline break-all"
-                            >
-                              {project.link}
-                            </a>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Add New Project Form */}
-                <div className={projects.length > 0 ? "border-t pt-8" : ""}>
-                  <h3 className="font-semibold mb-4 text-lg">Tambah Proyek Baru</h3>
-
-                  {projectError && (
-                    <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                      <p className="text-sm text-red-700">{projectError}</p>
-                    </div>
-                  )}
-
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-2">
-                        Nama Proyek{" "}
-                        <span className="text-[#FF6B6B]">*</span>
-                        <span className="text-xs text-muted-foreground">
-                          {" "}
-                          (Max 100 karakter)
-                        </span>
-                      </label>
-                      <Input
-                        placeholder="Cth: E-Commerce Platform"
-                        value={newProject.nama}
-                        onChange={(e) =>
-                          setNewProject({
-                            ...newProject,
-                            nama: e.target.value.slice(0, 100),
-                          })
-                        }
-                        maxLength={100}
-                        className="rounded-lg"
-                      />
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {newProject.nama.length}/100
+                {/* ============================================ */}
+                {/* VIEW 1: Projects List (Default View) */}
+                {/* ============================================ */}
+                {selectedProjectForSkillManagement === null ? (
+                  <>
+                    <div className="mb-8">
+                      <h2 className="text-2xl font-bold mb-2">Kelola Proyek</h2>
+                      <p className="text-muted-foreground">
+                        Tampilkan karya terbaik Anda kepada perekrut
                       </p>
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium mb-2">
-                        Deskripsi Proyek{" "}
-                        <span className="text-[#FF6B6B]">*</span>
-                      </label>
-                      <textarea
-                        placeholder="Jelaskan proyek Anda, teknologi yang digunakan, dan fitur utamanya..."
-                        value={newProject.deskripsi}
-                        onChange={(e) =>
-                          setNewProject({
-                            ...newProject,
-                            deskripsi: e.target.value,
-                          })
-                        }
-                        rows={4}
-                        className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6B6B]/50 resize-none"
-                      />
-                    </div>
+                    {/* Current Projects Display */}
+                    {projects.length > 0 && (
+                      <div className="mb-8">
+                        <h3 className="font-semibold mb-4 text-lg">
+                          Proyek Anda ({projects.length})
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {projects.map((project) => (
+                            <div
+                              key={project.id}
+                              className="p-6 border border-border rounded-2xl hover:border-[#FF6B6B] hover:shadow-lg transition-all bg-gradient-to-br from-white to-gray-50 flex flex-col"
+                            >
+                              <div className="flex items-start justify-between gap-4 mb-3">
+                                <h4 className="font-semibold text-base flex-1 line-clamp-2">
+                                  {project.nama}
+                                </h4>
+                                <button
+                                  onClick={() => handleRemoveProject(project.id)}
+                                  className="p-2 hover:bg-red-100 rounded-lg transition-colors text-[#FF6B6B] flex-shrink-0"
+                                  title="Hapus proyek"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                              <p className="text-sm text-muted-foreground mb-4 line-clamp-3 flex-1">
+                                {project.deskripsi}
+                              </p>
+                              {project.link && (
+                                <a
+                                  href={project.link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-xs text-[#FF6B6B] hover:underline break-all mb-4"
+                                >
+                                  {project.link}
+                                </a>
+                              )}
+                              
+                              {/* Project Skills Display */}
+                              {project.skills && project.skills.length > 0 && (
+                                <div className="mb-4">
+                                  <div className="flex flex-wrap gap-2">
+                                    {project.skills.map((skill) => (
+                                      <Badge
+                                        key={skill}
+                                        className="bg-[#FF6B6B]/10 text-[#FF6B6B] border-[#FF6B6B]/30 hover:bg-[#FF6B6B]/20 transition-colors"
+                                      >
+                                        <Code className="w-3 h-3 mr-1" />
+                                        {skill}
+                                      </Badge>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
 
-                    <div>
-                      <label className="block text-sm font-medium mb-2">
-                        Link Proyek{" "}
-                        <span className="text-muted-foreground">(Opsional)</span>
-                      </label>
-                      <Input
-                        placeholder="https://github.com/username/project"
-                        value={newProject.link}
-                        onChange={(e) =>
-                          setNewProject({
-                            ...newProject,
-                            link: e.target.value,
-                          })
-                        }
-                        type="url"
-                        className="rounded-lg"
-                      />
-                    </div>
+                              {/* Manage Skills Button */}
+                              <Button
+                                onClick={() => setSelectedProjectForSkillManagement(project.id)}
+                                className="w-full bg-[#FF6B6B]/80 hover:bg-[#FF6B6B] text-white rounded-lg h-9 flex items-center justify-center gap-2 text-sm"
+                              >
+                                <Code className="w-4 h-4" />
+                                Kelola Hard Skills
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
-                    <Button
-                      onClick={handleAddProject}
-                      className="w-full bg-[#FF6B6B] hover:bg-[#FF5252] text-white rounded-lg h-10 flex items-center justify-center gap-2"
-                    >
-                      <Plus className="w-4 h-4" />
-                      Tambah Proyek
-                    </Button>
-                  </div>
-                </div>
+                    {/* Add New Project Form */}
+                    <div className={projects.length > 0 ? "border-t pt-8" : ""}>
+                      <h3 className="font-semibold mb-4 text-lg">Tambah Proyek Baru</h3>
+
+                      {projectError && (
+                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                          <p className="text-sm text-red-700">{projectError}</p>
+                        </div>
+                      )}
+
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Nama Proyek{" "}
+                            <span className="text-[#FF6B6B]">*</span>
+                            <span className="text-xs text-muted-foreground">
+                              {" "}
+                              (Max 100 karakter)
+                            </span>
+                          </label>
+                          <Input
+                            placeholder="Cth: E-Commerce Platform"
+                            value={newProject.nama}
+                            onChange={(e) =>
+                              setNewProject({
+                                ...newProject,
+                                nama: e.target.value.slice(0, 100),
+                              })
+                            }
+                            maxLength={100}
+                            className="rounded-lg"
+                          />
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {newProject.nama.length}/100
+                          </p>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Deskripsi Proyek{" "}
+                            <span className="text-[#FF6B6B]">*</span>
+                          </label>
+                          <textarea
+                            placeholder="Jelaskan proyek Anda, teknologi yang digunakan, dan fitur utamanya..."
+                            value={newProject.deskripsi}
+                            onChange={(e) =>
+                              setNewProject({
+                                ...newProject,
+                                deskripsi: e.target.value,
+                              })
+                            }
+                            rows={4}
+                            className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6B6B]/50 resize-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Link Proyek{" "}
+                            <span className="text-muted-foreground">(Opsional)</span>
+                          </label>
+                          <Input
+                            placeholder="https://github.com/username/project"
+                            value={newProject.link}
+                            onChange={(e) =>
+                              setNewProject({
+                                ...newProject,
+                                link: e.target.value,
+                              })
+                            }
+                            type="url"
+                            className="rounded-lg"
+                          />
+                        </div>
+
+                        <Button
+                          onClick={handleAddProject}
+                          className="w-full bg-[#FF6B6B] hover:bg-[#FF5252] text-white rounded-lg h-10 flex items-center justify-center gap-2"
+                        >
+                          <Plus className="w-4 h-4" />
+                          Tambah Proyek
+                        </Button>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  /* ============================================ */
+                  /* VIEW 2: Manage Skills for Selected Project */
+                  /* ============================================ */
+                  <>
+                    {projects.find((p) => p.id === selectedProjectForSkillManagement) && (
+                      <>
+                        <div className="mb-8">
+                          <button
+                            onClick={() => setSelectedProjectForSkillManagement(null)}
+                            className="inline-flex items-center gap-2 text-[#FF6B6B] hover:text-[#FF5252] font-medium mb-4 transition-colors"
+                          >
+                            <X className="w-5 h-5" />
+                            Kembali ke Daftar Proyek
+                          </button>
+
+                          <div>
+                            <h2 className="text-2xl font-bold mb-2">
+                              Kelola Hard Skills: "
+                              {projects.find((p) => p.id === selectedProjectForSkillManagement)
+                                ?.nama}
+                              "
+                            </h2>
+                            <p className="text-muted-foreground">
+                              Kelola hard skills yang terkait dengan project ini
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Current Project Skills */}
+                        {projects.find((p) => p.id === selectedProjectForSkillManagement)
+                          ?.skills.length! > 0 && (
+                          <div className="mb-8">
+                            <h3 className="font-semibold mb-4 text-lg">
+                              Hard Skills Proyek (
+                              {
+                                projects.find(
+                                  (p) => p.id === selectedProjectForSkillManagement
+                                )?.skills.length
+                              }
+                              )
+                            </h3>
+                            <div className="space-y-3">
+                              {projects
+                                .find((p) => p.id === selectedProjectForSkillManagement)
+                                ?.skills.map((skill) => (
+                                  <div
+                                    key={skill}
+                                    className="flex items-center justify-between gap-4 p-4 bg-gradient-to-r from-[#FF6B6B]/5 to-transparent rounded-2xl border border-[#FF6B6B]/20 hover:border-[#FF6B6B]/40 transition-colors"
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#FF6B6B] to-[#FF8E8E] flex items-center justify-center">
+                                        <Code className="w-5 h-5 text-white" />
+                                      </div>
+                                      <p className="font-semibold text-base">
+                                        {skill}
+                                      </p>
+                                    </div>
+                                    <button
+                                      onClick={() =>
+                                        handleRemoveSkillFromProject(
+                                          selectedProjectForSkillManagement,
+                                          skill
+                                        )
+                                      }
+                                      className="p-2 hover:bg-red-100 rounded-lg transition-colors text-[#FF6B6B]"
+                                      title="Hapus skill"
+                                    >
+                                      <X className="w-5 h-5" />
+                                    </button>
+                                  </div>
+                                ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Add New Skill to Project */}
+                        <div className="border-t pt-8">
+                          <h3 className="font-semibold mb-4 text-lg">
+                            Tambah Hard Skill
+                          </h3>
+
+                          <div className="space-y-4">
+                            {/* Skill Search Input */}
+                            <div className="relative">
+                              <div className="flex items-center gap-2 relative">
+                                <Input
+                                  placeholder="Cari skill (e.g., React, TypeScript, Tailwind)"
+                                  value={projectSkillSearch}
+                                  onChange={(e) =>
+                                    setProjectSkillSearch(e.target.value)
+                                  }
+                                  onFocus={() => setShowProjectSkillDropdown(true)}
+                                  onBlur={() =>
+                                    setTimeout(
+                                      () => setShowProjectSkillDropdown(false),
+                                      200
+                                    )
+                                  }
+                                  className="rounded-lg pr-10"
+                                />
+                                <ChevronDown
+                                  className={`absolute right-3 w-4 h-4 text-muted-foreground transition-transform ${
+                                    showProjectSkillDropdown ? "rotate-180" : ""
+                                  }`}
+                                />
+                              </div>
+
+                              {/* Dropdown Menu */}
+                              {showProjectSkillDropdown && (
+                                <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-border rounded-lg shadow-lg z-10 max-h-64 overflow-y-auto">
+                                  {getProjectFilteredSkills(
+                                    selectedProjectForSkillManagement
+                                  ).length > 0 ? (
+                                    getProjectFilteredSkills(
+                                      selectedProjectForSkillManagement
+                                    ).map((skill) => (
+                                      <button
+                                        key={skill}
+                                        type="button"
+                                        onClick={() =>
+                                          handleAddSkillToProject(
+                                            selectedProjectForSkillManagement,
+                                            skill
+                                          )
+                                        }
+                                        className="w-full text-left px-4 py-3 hover:bg-[#FF6B6B]/5 transition-colors border-b border-border/30 last:border-b-0"
+                                      >
+                                        <div className="flex items-center gap-2">
+                                          <Code className="w-4 h-4 text-[#FF6B6B]" />
+                                          <span className="text-sm">{skill}</span>
+                                        </div>
+                                      </button>
+                                    ))
+                                  ) : (
+                                    <div className="px-4 py-3 text-sm text-muted-foreground text-center">
+                                      Semua skill sudah ditambahkan atau tidak ada hasil
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+
+                            <p className="text-xs text-muted-foreground">
+                              Total Master Skills: {masterSkills.length}
+                            </p>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </>
+                )}
               </div>
             </TabsContent>
 
