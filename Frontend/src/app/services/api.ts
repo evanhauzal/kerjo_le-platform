@@ -144,13 +144,17 @@ export const profileApi = {
   addSkill: (payload: { skill_id: number; level: number }) => request<{ message: string; skill: UserSkill }>("/profile/skills", { method: "POST", body: JSON.stringify(payload) }),
   deleteSkill: (id: number) => request<{ message: string }>(`/profile/skills/${id}`, { method: "DELETE" }),
   addProject: (payload: { project_name: string; description: string; link?: string; skill_ids: number[] }) => request<any>("/profile/projects", { method: "POST", body: JSON.stringify(payload) }),
+  deleteProject: (id: number) => request<{ message: string }>(`/profile/projects/${id}`, { method: "DELETE" }),
   addCertificate: (payload: { certificate_name: string; issuer: string; issue_date: string; skill_id?: number | null }) => request<any>("/profile/certificates", { method: "POST", body: JSON.stringify(payload) }),
+  deleteCertificate: (id: number) => request<{ message: string }>(`/profile/certificates/${id}`, { method: "DELETE" }),
 };
 
 export const skillsApi = { getSkills: () => request<Skill[]>("/skills") };
 
 export const jobsApi = {
   getJobs: () => request<Job[]>("/jobs"),
+
+  recommendedJobs: () => request<Job[]>("/jobs/recommended"),
 
   searchJobs: (params: {
     keyword?: string;

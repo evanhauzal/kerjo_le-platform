@@ -99,7 +99,7 @@ export default function ApplicantDetailPage() {
 
           <h1 className="text-4xl font-bold mb-2">Detail Pelamar</h1>
           <p className="text-muted-foreground text-lg mb-8">
-            Informasi kandidat diambil dari backend.
+            Informasi kandidat.
           </p>
 
           <div className="bg-white rounded-3xl shadow-xl p-8 border border-border mb-6">
@@ -119,19 +119,18 @@ export default function ApplicantDetailPage() {
               </div>
 
               <span
-                className={`px-4 py-2 rounded-2xl text-sm font-semibold ${
-                  applicant.status === "pending"
+                className={`px-4 py-2 rounded-2xl text-sm font-semibold ${applicant.status === "pending"
                     ? "bg-yellow-100 text-yellow-700"
                     : applicant.status === "accepted"
-                    ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-700"
-                }`}
+                      ? "bg-green-100 text-green-700"
+                      : "bg-red-100 text-red-700"
+                  }`}
               >
                 {applicant.status === "pending"
                   ? "Pending"
                   : applicant.status === "accepted"
-                  ? "Diterima"
-                  : "Ditolak"}
+                    ? "Diterima"
+                    : "Ditolak"}
               </span>
             </div>
 
@@ -237,11 +236,10 @@ export default function ApplicantDetailPage() {
 
               <button
                 onClick={confirmAction}
-                className={`flex-1 px-6 py-3 rounded-2xl font-semibold text-white ${
-                  actionType === "accepted"
+                className={`flex-1 px-6 py-3 rounded-2xl font-semibold text-white ${actionType === "accepted"
                     ? "bg-green-500 hover:bg-green-600"
                     : "bg-red-500 hover:bg-red-600"
-                }`}
+                  }`}
               >
                 Konfirmasi
               </button>

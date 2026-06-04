@@ -77,7 +77,7 @@ export default function ApplicantsListPage() {
           <h1 className="text-4xl font-bold mt-4 mb-2">Kandidat Pelamar</h1>
 
           <p className="text-muted-foreground mb-8">
-            Diurutkan dari matching score tertinggi sesuai FSD scoring.
+            Diurutkan dari matching score tertinggi.
           </p>
 
           {error && (
@@ -143,11 +143,10 @@ export default function ApplicantsListPage() {
                         type="button"
                         disabled={isUpdating || isFinished}
                         onClick={() => update(c.id, "accepted")}
-                        className={`px-4 py-2 rounded-xl text-white ${
-                          isUpdating || isFinished
+                        className={`px-4 py-2 rounded-xl text-white ${isUpdating || isFinished
                             ? "bg-gray-400 cursor-not-allowed"
                             : "bg-green-600 hover:bg-green-700"
-                        }`}
+                          }`}
                       >
                         {isUpdating ? "Memproses..." : "Terima"}
                       </button>
@@ -156,11 +155,10 @@ export default function ApplicantsListPage() {
                         type="button"
                         disabled={isUpdating || isFinished}
                         onClick={() => update(c.id, "rejected")}
-                        className={`px-4 py-2 rounded-xl text-white ${
-                          isUpdating || isFinished
+                        className={`px-4 py-2 rounded-xl text-white ${isUpdating || isFinished
                             ? "bg-gray-400 cursor-not-allowed"
                             : "bg-red-600 hover:bg-red-700"
-                        }`}
+                          }`}
                       >
                         {isUpdating ? "Memproses..." : "Tolak"}
                       </button>

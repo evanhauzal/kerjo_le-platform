@@ -43,7 +43,7 @@ export default function CompanyDashboard() {
             <div>
               <h1 className="text-4xl font-bold mb-2">Dashboard Perusahaan</h1>
               <p className="text-muted-foreground text-lg">Halo, <b>{company?.company_name}</b></p>
-              <p className="text-sm text-muted-foreground">Data lowongan dan pelamar dibaca langsung dari backend.</p>
+              <p className="text-sm text-muted-foreground">Data lowongan dan pelamar.</p>
             </div>
             <Link to="/perusahaan/tambah-lowongan" className="px-6 py-3 bg-[var(--coral)] text-white rounded-2xl font-semibold hover:bg-[var(--coral-light)] flex items-center gap-2"><Plus className="w-4 h-4" /> Tambah Lowongan</Link>
           </div>

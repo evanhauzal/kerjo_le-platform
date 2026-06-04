@@ -6,7 +6,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterSelectionPage from "./pages/RegisterSelectionPage";
 import JobSeekerRegisterPage from "./pages/JobSeekerRegisterPage";
 import CompanyRegisterPage from "./pages/CompanyRegisterPage";
-import JobSeekerDashboard from "./pages/JobSeekerDashboard";
+import ApplicantDashboard from "./pages/ApplicantDashboard";
 import CompanyDashboard from "./pages/CompanyDashboard";
 import ManageJobsPage from "./pages/ManageJobsPage";
 import AddJobPage from "./pages/AddJobPage";
@@ -45,7 +45,7 @@ export const router = createBrowserRouter([
   },
   {
     path: "/pelamar/dashboard",
-    Component: JobSeekerDashboard,
+    Component: ApplicantDashboard,
   },
   {
     path: "/perusahaan/dashboard",
