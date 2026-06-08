@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { Briefcase, FileText, CheckCircle2, Clock, XCircle, X, Plus, Trash2, Award, Code, Calendar, Building } from "lucide-react";
+import { Briefcase, FileText, CheckCircle2, Clock, XCircle, X, Plus, Trash2, Award, Code, Calendar, Building, ChevronDown } from "lucide-react";
 
 // Type Definitions
 interface Skill {
@@ -16,6 +16,7 @@ interface Project {
   nama: string;
   deskripsi: string;
   link: string;
+  skills: string[];
 }
 
 interface Certificate {
@@ -57,16 +58,31 @@ export default function JobSeekerDashboard() {
       nama: "E-Commerce Platform",
       deskripsi: "Platform e-commerce dengan fitur checkout dan payment gateway terintegrasi",
       link: "https://github.com/example/ecommerce",
+      skills: ["React", "TypeScript", "Tailwind CSS"],
     },
     {
       id: 2,
       nama: "Task Management App",
       deskripsi: "Aplikasi manajemen tugas dengan real-time collaboration",
       link: "https://github.com/example/task-app",
+      skills: ["React", "Firebase"],
     },
   ]);
   const [newProject, setNewProject] = useState({ nama: "", deskripsi: "", link: "" });
   const [projectError, setProjectError] = useState("");
+
+  // New Project Skill Input State
+  const [newProjectSkills, setNewProjectSkills] = useState<string[]>([]);
+  const [newProjectSkillSearch, setNewProjectSkillSearch] = useState("");
+  const [showNewProjectSkillDropdown, setShowNewProjectSkillDropdown] = useState(false);
+
+  // Master Skills List
+  const masterSkills = [
+    "React", "TypeScript", "Tailwind CSS", "Vue.js", "Angular", "Node.js",
+    "Python", "JavaScript", "Firebase", "MongoDB", "PostgreSQL", "GraphQL",
+    "Redux", "Git", "Docker", "AWS", "Figma", "UI Design", "UX Design",
+    "Next.js", "Express.js", "REST API", "MySQL", "CSS/SCSS", "HTML5",
+  ].sort();
 
   // Certificates state
   const [certificates, setCertificates] = useState<Certificate[]>([
@@ -165,13 +181,37 @@ export default function JobSeekerDashboard() {
         nama: newProject.nama,
         deskripsi: newProject.deskripsi,
         link: newProject.link,
+        skills: newProjectSkills,
       },
     ]);
     setNewProject({ nama: "", deskripsi: "", link: "" });
+    setNewProjectSkills([]);
+    setNewProjectSkillSearch("");
   };
 
   const handleRemoveProject = (id: number) => {
     setProjects(projects.filter((p) => p.id !== id));
+  };
+
+  // New Project Skill Handlers
+  const handleAddSkillToNewProject = (skill: string) => {
+    if (!newProjectSkills.includes(skill)) {
+      setNewProjectSkills([...newProjectSkills, skill]);
+    }
+    setNewProjectSkillSearch("");
+    setShowNewProjectSkillDropdown(false);
+  };
+
+  const handleRemoveSkillFromNewProject = (skillToRemove: string) => {
+    setNewProjectSkills(newProjectSkills.filter((s) => s !== skillToRemove));
+  };
+
+  const getNewProjectFilteredSkills = () => {
+    return masterSkills.filter(
+      (skill) =>
+        skill.toLowerCase().includes(newProjectSkillSearch.toLowerCase()) &&
+        !newProjectSkills.includes(skill)
+    );
   };
 
   // Certificates handlers
@@ -526,6 +566,20 @@ export default function JobSeekerDashboard() {
                             {project.link}
                           </a>
                         )}
+                        {/* Skills Tags */}
+                        {project.skills && project.skills.length > 0 && (
+                          <div className="flex flex-wrap gap-2 mt-3">
+                            {project.skills.map((skill) => (
+                              <span
+                                key={skill}
+                                className="inline-flex items-center gap-1 px-2 py-1 bg-[var(--coral)]/10 text-[var(--coral)] border border-[var(--coral)]/30 rounded-full text-xs font-medium"
+                              >
+                                <Code className="w-3 h-3" />
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -588,6 +642,83 @@ export default function JobSeekerDashboard() {
                       }
                       className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--coral)]/50"
                     />
+                  </div>
+
+                  {/* Skill Selection for New Project */}
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Hard Skills Project{" "}
+                      <span className="text-muted-foreground text-xs">(Opsional)</span>
+                    </label>
+
+                    {/* Selected Skills Badges */}
+                    {newProjectSkills.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {newProjectSkills.map((skill) => (
+                          <span
+                            key={skill}
+                            className="inline-flex items-center gap-1 pl-2 pr-1 py-1 bg-[var(--coral)]/10 text-[var(--coral)] border border-[var(--coral)]/30 rounded-full text-xs font-medium"
+                          >
+                            <Code className="w-3 h-3" />
+                            {skill}
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveSkillFromNewProject(skill)}
+                              className="ml-1 rounded-full hover:bg-[var(--coral)]/20 p-0.5"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Skill Search Dropdown */}
+                    <div className="relative">
+                      <div className="flex items-center relative">
+                        <input
+                          type="text"
+                          placeholder="Cari dan tambah skill (e.g., React, TypeScript)"
+                          value={newProjectSkillSearch}
+                          onChange={(e) => setNewProjectSkillSearch(e.target.value)}
+                          onFocus={() => setShowNewProjectSkillDropdown(true)}
+                          onBlur={() =>
+                            setTimeout(() => setShowNewProjectSkillDropdown(false), 200)
+                          }
+                          className="w-full px-4 py-2 pr-10 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--coral)]/50"
+                        />
+                        <ChevronDown
+                          className={`absolute right-3 w-4 h-4 text-muted-foreground transition-transform ${
+                            showNewProjectSkillDropdown ? "rotate-180" : ""
+                          }`}
+                        />
+                      </div>
+
+                      {/* Dropdown Menu */}
+                      {showNewProjectSkillDropdown && (
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-border rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+                          {getNewProjectFilteredSkills().length > 0 ? (
+                            getNewProjectFilteredSkills().map((skill) => (
+                              <button
+                                key={skill}
+                                type="button"
+                                onClick={() => handleAddSkillToNewProject(skill)}
+                                className="w-full text-left px-4 py-3 hover:bg-[var(--coral)]/5 transition-colors border-b border-border/30 last:border-b-0"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <Code className="w-4 h-4 text-[var(--coral)]" />
+                                  <span className="text-sm">{skill}</span>
+                                </div>
+                              </button>
+                            ))
+                          ) : (
+                            <div className="px-4 py-3 text-sm text-muted-foreground text-center">
+                              Semua skill sudah dipilih atau tidak ada hasil
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <button

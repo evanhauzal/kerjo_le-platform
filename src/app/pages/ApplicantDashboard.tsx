@@ -113,6 +113,11 @@ export default function ApplicantDashboard() {
   });
   const [projectError, setProjectError] = useState("");
 
+  // New Project Skill Input State
+  const [newProjectSkills, setNewProjectSkills] = useState<string[]>([]);
+  const [newProjectSkillSearch, setNewProjectSkillSearch] = useState("");
+  const [showNewProjectSkillDropdown, setShowNewProjectSkillDropdown] = useState(false);
+
   // Project Skill Management State
   const [selectedProjectForSkillManagement, setSelectedProjectForSkillManagement] =
     useState<number | null>(null);
@@ -271,11 +276,13 @@ export default function ApplicantDashboard() {
         nama: newProject.nama,
         deskripsi: newProject.deskripsi,
         link: newProject.link,
-        skills: [],
+        skills: newProjectSkills,
       },
     ]);
 
     setNewProject({ nama: "", deskripsi: "", link: "" });
+    setNewProjectSkills([]);
+    setNewProjectSkillSearch("");
   };
 
   const handleRemoveProject = (id: number) => {
@@ -319,6 +326,27 @@ export default function ApplicantDashboard() {
       (skill) =>
         skill.toLowerCase().includes(projectSkillSearch.toLowerCase()) &&
         !project?.skills.includes(skill)
+    );
+  };
+
+  // New Project Skill Handlers
+  const handleAddSkillToNewProject = (skill: string) => {
+    if (!newProjectSkills.includes(skill)) {
+      setNewProjectSkills([...newProjectSkills, skill]);
+    }
+    setNewProjectSkillSearch("");
+    setShowNewProjectSkillDropdown(false);
+  };
+
+  const handleRemoveSkillFromNewProject = (skillToRemove: string) => {
+    setNewProjectSkills(newProjectSkills.filter((s) => s !== skillToRemove));
+  };
+
+  const getNewProjectFilteredSkills = () => {
+    return masterSkills.filter(
+      (skill) =>
+        skill.toLowerCase().includes(newProjectSkillSearch.toLowerCase()) &&
+        !newProjectSkills.includes(skill)
     );
   };
 
@@ -661,6 +689,7 @@ export default function ApplicantDashboard() {
                               key={project.id}
                               className="p-6 border border-border rounded-2xl hover:border-[#FF6B6B] hover:shadow-lg transition-all bg-gradient-to-br from-white to-gray-50 flex flex-col"
                             >
+                              {/* Title and Delete */}
                               <div className="flex items-start justify-between gap-4 mb-3">
                                 <h4 className="font-semibold text-base flex-1 line-clamp-2">
                                   {project.nama}
@@ -673,9 +702,13 @@ export default function ApplicantDashboard() {
                                   <Trash2 className="w-4 h-4" />
                                 </button>
                               </div>
+
+                              {/* Description */}
                               <p className="text-sm text-muted-foreground mb-4 line-clamp-3 flex-1">
                                 {project.deskripsi}
                               </p>
+
+                              {/* Link */}
                               {project.link && (
                                 <a
                                   href={project.link}
@@ -686,28 +719,26 @@ export default function ApplicantDashboard() {
                                   {project.link}
                                 </a>
                               )}
-                              
-                              {/* Project Skills Display */}
+
+                              {/* Skills Tags */}
                               {project.skills && project.skills.length > 0 && (
-                                <div className="mb-4">
-                                  <div className="flex flex-wrap gap-2">
-                                    {project.skills.map((skill) => (
-                                      <Badge
-                                        key={skill}
-                                        className="bg-[#FF6B6B]/10 text-[#FF6B6B] border-[#FF6B6B]/30 hover:bg-[#FF6B6B]/20 transition-colors"
-                                      >
-                                        <Code className="w-3 h-3 mr-1" />
-                                        {skill}
-                                      </Badge>
-                                    ))}
-                                  </div>
+                                <div className="flex flex-wrap gap-2 mb-3 mt-2">
+                                  {project.skills.map((skill) => (
+                                    <Badge
+                                      key={skill}
+                                      className="bg-[#FF6B6B]/10 text-[#FF6B6B] border border-[#FF6B6B]/30 text-xs"
+                                    >
+                                      <Code className="w-3 h-3 mr-1" />
+                                      {skill}
+                                    </Badge>
+                                  ))}
                                 </div>
                               )}
 
-                              {/* Manage Skills Button */}
+                              {/* Button Always Visible */}
                               <Button
                                 onClick={() => setSelectedProjectForSkillManagement(project.id)}
-                                className="w-full bg-[#FF6B6B]/80 hover:bg-[#FF6B6B] text-white rounded-lg h-9 flex items-center justify-center gap-2 text-sm"
+                                className="w-full bg-[#FF6B6B] hover:bg-[#FF5252] text-white rounded-lg h-9 flex items-center justify-center gap-2 text-sm mt-auto"
                               >
                                 <Code className="w-4 h-4" />
                                 Kelola Hard Skills
@@ -715,6 +746,8 @@ export default function ApplicantDashboard() {
                             </div>
                           ))}
                         </div>
+
+
                       </div>
                     )}
 
@@ -793,6 +826,82 @@ export default function ApplicantDashboard() {
                           />
                         </div>
 
+                        {/* Skill Selection for New Project */}
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Hard Skills Proyek{" "}
+                            <span className="text-muted-foreground text-xs">(Opsional)</span>
+                          </label>
+
+                          {/* Selected Skills Badges */}
+                          {newProjectSkills.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mb-3">
+                              {newProjectSkills.map((skill) => (
+                                <Badge
+                                  key={skill}
+                                  className="bg-[#FF6B6B]/10 text-[#FF6B6B] border border-[#FF6B6B]/30 flex items-center gap-1 pr-1"
+                                >
+                                  <Code className="w-3 h-3" />
+                                  {skill}
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemoveSkillFromNewProject(skill)}
+                                    className="ml-1 rounded hover:bg-[#FF6B6B]/20 p-0.5"
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </button>
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Skill Search Dropdown */}
+                          <div className="relative">
+                            <div className="flex items-center gap-2 relative">
+                              <Input
+                                placeholder="Cari dan tambah skill (e.g., React, TypeScript)"
+                                value={newProjectSkillSearch}
+                                onChange={(e) => setNewProjectSkillSearch(e.target.value)}
+                                onFocus={() => setShowNewProjectSkillDropdown(true)}
+                                onBlur={() =>
+                                  setTimeout(() => setShowNewProjectSkillDropdown(false), 200)
+                                }
+                                className="rounded-lg pr-10"
+                              />
+                              <ChevronDown
+                                className={`absolute right-3 w-4 h-4 text-muted-foreground transition-transform ${
+                                  showNewProjectSkillDropdown ? "rotate-180" : ""
+                                }`}
+                              />
+                            </div>
+
+                            {/* Dropdown Menu */}
+                            {showNewProjectSkillDropdown && (
+                              <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-border rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+                                {getNewProjectFilteredSkills().length > 0 ? (
+                                  getNewProjectFilteredSkills().map((skill) => (
+                                    <button
+                                      key={skill}
+                                      type="button"
+                                      onClick={() => handleAddSkillToNewProject(skill)}
+                                      className="w-full text-left px-4 py-3 hover:bg-[#FF6B6B]/5 transition-colors border-b border-border/30 last:border-b-0"
+                                    >
+                                      <div className="flex items-center gap-2">
+                                        <Code className="w-4 h-4 text-[#FF6B6B]" />
+                                        <span className="text-sm">{skill}</span>
+                                      </div>
+                                    </button>
+                                  ))
+                                ) : (
+                                  <div className="px-4 py-3 text-sm text-muted-foreground text-center">
+                                    Semua skill sudah dipilih atau tidak ada hasil
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
                         <Button
                           onClick={handleAddProject}
                           className="w-full bg-[#FF6B6B] hover:bg-[#FF5252] text-white rounded-lg h-10 flex items-center justify-center gap-2"
@@ -833,16 +942,13 @@ export default function ApplicantDashboard() {
                         </div>
 
                         {/* Current Project Skills */}
-                        {projects.find((p) => p.id === selectedProjectForSkillManagement)
-                          ?.skills.length! > 0 && (
+                        {(() => {
+                          const project = projects.find((p) => p.id === selectedProjectForSkillManagement);
+                          return project && project.skills && project.skills.length > 0 ? (
                           <div className="mb-8">
                             <h3 className="font-semibold mb-4 text-lg">
                               Hard Skills Proyek (
-                              {
-                                projects.find(
-                                  (p) => p.id === selectedProjectForSkillManagement
-                                )?.skills.length
-                              }
+                              {project.skills.length}
                               )
                             </h3>
                             <div className="space-y-3">
@@ -877,7 +983,8 @@ export default function ApplicantDashboard() {
                                 ))}
                             </div>
                           </div>
-                        )}
+                          ) : null;
+                        })()}
 
                         {/* Add New Skill to Project */}
                         <div className="border-t pt-8">
