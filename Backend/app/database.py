@@ -1,26 +1,59 @@
 import os
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
 from dotenv import load_dotenv
 
-# Membaca file .env saat berjalan di komputer lokal
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
+
+# Load .env saat development lokal
 load_dotenv()
 
-# Mengambil konfigurasi dari environment variable secara aman
+# Ambil environment variable
 DATABASE_URL = os.getenv("DATABASE_URL")
 SECRET_KEY = os.getenv("SECRET_KEY", "fallback-key-untuk-lokal")
+
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-# Memastikan string koneksi dari Supabase menggunakan driver psycopg versi 3
-if DATABASE_URL and DATABASE_URL.startswith("postgresql://"):
-    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
-elif DATABASE_URL and DATABASE_URL.startswith("postgresql+psycopg2://"):
-    DATABASE_URL = DATABASE_URL.replace("postgresql+psycopg2://", "postgresql+psycopg://", 1)
+# Validasi DATABASE_URL
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL tidak ditemukan di environment variables")
 
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# Paksa menggunakan driver psycopg v3
+if DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace(
+        "postgresql://",
+        "postgresql+psycopg://",
+        1
+    )
+
+elif DATABASE_URL.startswith("postgresql+psycopg2://"):
+    DATABASE_URL = DATABASE_URL.replace(
+        "postgresql+psycopg2://",
+        "postgresql+psycopg://",
+        1
+    )
+
+# Hapus parameter pgbouncer=true jika ada
+DATABASE_URL = DATABASE_URL.replace("?pgbouncer=true", "")
+DATABASE_URL = DATABASE_URL.replace("&pgbouncer=true", "")
+
+# SQLAlchemy Engine
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,
+    pool_recycle=300,
+)
+
+# Session Factory
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine
+)
+
+# Base Model
 Base = declarative_base()
+
 
 def get_db():
     db = SessionLocal()
