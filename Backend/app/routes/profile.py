@@ -7,7 +7,7 @@ from app.routes.dependencies import require_role
 import os
 
 router = APIRouter(prefix="/profile", tags=["Profil Pelamar"])
-UPLOAD_DIR = "uploads/cv"
+UPLOAD_DIR = "/tmp/uploads/cv"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
