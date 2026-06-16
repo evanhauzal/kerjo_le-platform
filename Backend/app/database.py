@@ -11,6 +11,8 @@ load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
 SECRET_KEY = os.getenv("SECRET_KEY", "fallback-key-untuk-lokal")
 
+print("DATABASE_URL =", DATABASE_URL)
+
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
