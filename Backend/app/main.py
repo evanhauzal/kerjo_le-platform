@@ -12,8 +12,7 @@ if backend_dir not in sys.path:
 
 # Baris perintah impormu yang sudah ada sebelumnya diletakkan setelah kode di atas
 from fastapi import FastAPI, Depends, HTTPException
-from app.database import Base, engine, SessionLocal
-# ... sisa kode main.py milikmu ke bawah
+from .database import Base, engine, SessionLocal
 
 from time import sleep
 from fastapi import FastAPI
