@@ -1,3 +1,20 @@
+import os
+import sys
+
+# Mendapatkan jalur absolut dari direktori tempat berkas main.py ini berada
+current_dir = os.path.dirname(os.path.abspath(__file__))
+# Mendapatkan jalur induknya (yaitu folder Backend)
+backend_dir = os.path.dirname(current_dir)
+
+# Memasukkan folder Backend ke dalam sistem jalur pencarian Python jika belum terdaftar
+if backend_dir not in sys.path:
+    sys.path.insert(0, backend_dir)
+
+# Baris perintah impormu yang sudah ada sebelumnya diletakkan setelah kode di atas
+from fastapi import FastAPI, Depends, HTTPException
+from app.database import Base, engine, SessionLocal
+# ... sisa kode main.py milikmu ke bawah
+
 from time import sleep
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
